@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		canvas{
+			border:#E6E6E6 1px solid;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='t1'></canvas>
+	<canvas id='t2'></canvas>
+	<canvas id='t3'></canvas>
+	<canvas id='t4'></canvas>
+	<canvas id='t5'></canvas>
+	
+	<script type='text/javascript'>
+
+		//接下来绘制-----路径
+		var c=document.getElementById('t1');//查找canvas元素
+		var cxt=c.getContext('2d');//创建context对象：getContext("2d") 对象是内建的 HTML5 对象，拥有多种绘制路径、矩形、圆形、字符以及添加图像的方法。
+		cxt.moveTo(0,0);//起笔位置
+		cxt.lineTo(100,100);//目标位置
+		cxt.lineTo(100,0);
+		cxt.stroke();//落笔！！！会指线条一定要写
+
+
+	    //接下来绘制-----矩形
+	    var c2=document.getElementById('t2');
+		var cxt2=c2.getContext('2d');
+
+	    cxt2.fillStyle='#DBE6FD';//说明填充的颜色
+	    cxt2.fillRect(20,0,150,75);//表示：在画布上绘制150*75的矩形，从左上方坐标为（20，0）位置开始
+
+
+	    //接下来绘制---圆形
+	    var c3=document.getElementById('t3');
+		var cxt3=c3.getContext('2d');
+
+		cxt3.fillStyle='red';
+		cxt3.beginPath();//重新开始画圆，防止冲突重叠
+		cxt3.arc(70,18,15,0,Math.PI*2,true);//(70,18)圆心\15半径\0从3点钟方向（即x轴）开始画\Math.PI*2圆弧大小\true逆时针false顺时针
+		cxt3.closePath();//结束画布
+		cxt3.fill();//开始填充
+
+
+		//------渐变-------
+		var c4=document.getElementById('t4');
+		var cxt4=c4.getContext('2d');
+
+		var grd=cxt4.createLinearGradient(0,0,200,50);//(x,y,x1,y1):(x,y)渐变开始点的坐标\(x1,y1)渐变结束点的坐标
+		grd.addColorStop(0,'#B58CCE');//范围0-1
+		//grd.addColorStop(0.5,"red");//多种渐变中间可以加
+		grd.addColorStop(1,'#24D0EE');
+		cxt4.fillStyle=grd;
+		cxt4.fillRect(0,0,200,50);
+		
+
+		//-----图像-------
+		var c5=document.getElementById('t5');
+		var cxt5=c5.getContext('2d');
+		var img=new Image();
+		img.src="can.png";
+		img.onload=function(){
+			cxt5.drawImage(img,10,10,250,150);//（10，10）定位,width:250,height:150
+		}
+		
+
+
+		//HTML5新特性
+		//1.本地存储localstorage和sessionstorage
+
+		if(localStorage.a){//关闭网页后再次打开，会在原来的基础上自增
+			localStorage.a++;
+		}else{
+			localStorage.a=0;
+		}
+
+		if(sessionStorage.b){//关闭网页后数据被删除，再次打开，会在重新从初值开始自增
+			sessionStorage.b++;
+		}else{
+			sessionStorage.b=0;
+		}
+
+		//localStorage存储对象
+		
+		//由于localStorage只能存取字符串，如果存对象，可以用JSON.stringify（）存，用JSON.parse（）取
+		var c={
+			p:3,
+			r:5
+		}
+		c=JSON.stringify(c);
+		localStorage.c=c;
+		var  obj=JSON.parse(localStorage.c);
+		console.log(obj.p);//'3'
+
+		//也可以用以下方式：
+
+		//存储变量名为key，值为value的对象
+		localStorage.setItem('f',6);//(key,value)
+		localStorage.key='value';
+
+		//获取存储变量key的值
+		localStorage.getItem('key');
+		localStorage.key;
+
+		//删除
+		localStorage.removeItem('key');//删除变量名为key存储的值
+		localStorage.clear();//清空所有
+
+		/*2.地理定位
+		*用不了，直接搜网上的api，例：百度地图
+		*/
+
+		/*3.离线应用缓存
+
+		前端：
+		（1）<html manifest='demo.appache'>//说明文件路径
+		（2）与后台协商数据
+		后台：
+		（1）把想让用户离线缓存的数据放在配置文件manifest中
+		（2）manifest文件包含：
+			CACHE MANIFEST（以下文件无论用户何时与因特网断开连接，这些资源依然是可用的）
+			# 2012-02-21 v2.1.4 （#开头为注释标志，应用的缓存会在其 manifest 文件更改时被更新。更新注释行中的日期和版本号是一种使浏览器重新缓存文件的办法。）
+			/theme.css
+			/logo.gif
+			/main.js
+			NETWORK:（规定文件 "login.asp" 永远不会被缓存，且离线时是不可用的）
+			login.asp
+		*/
+
+
+		/*4.Web Workers(运行在后台的js，额外增加一个线程取执行它，不会影响页面性能)
+		*
+		*/
+
+		//传统方法最小化以后在打开会一下子跳出来
+		/*var b = 1;
+		function a(){
+			setTimeout(function(){
+			  	b++;
+			  	console.log(b);
+			  	a();
+			},1000);
+		}
+		a();*/
+
+		//web workers在后台运行，打开以后是运行后的结果，不会一下跳出来
+		var w;
+		function startWorker(){
+			if(typeof(Worker)!=="undefined"){
+			  	if(typeof(w)=="undefined"){
+			  		w=new Worker("demo.js");
+				}
+			  	w.onmessage = function (event) {
+			    	console.log(event.data);
+			    }
+			 
+			}
+		}
+		function stopWorker(){ 
+			w.terminate();
+		}
+
+		startWorker();
+
+
+
+
+
+
+
+
+
+
+	</script>
+</body>
+</html>
